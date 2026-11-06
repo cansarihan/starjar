@@ -1,0 +1,21 @@
+# Rust
+target/
+**/test_snapshots/
+
+# Node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+
+# Stellar CLI local config
+.stellar/
