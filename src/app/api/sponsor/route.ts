@@ -2,6 +2,7 @@ import { Keypair, TransactionBuilder, rpc, scValToNative } from "@stellar/stella
 import { NextResponse } from "next/server";
 
 import { CONFIG } from "@/lib/config";
+import { explainContractError } from "@/lib/errors";
 import { server } from "@/lib/soroban";
 import { WindowLimiter } from "@/lib/server/rate-limit";
 import { checkEnvelope, type Policy } from "@/lib/server/sponsor-policy";
@@ -64,7 +65,7 @@ export async function POST(req: Request) {
   const sim = await rpcServer.simulateTransaction(verdict.tx);
   if (rpc.Api.isSimulationError(sim)) {
     perAccount.refund(verdict.source);
-    return fail(400, `The contract refused this call: ${contractError(sim.error)}`);
+    return fail(400, explainContractError(sim.error));
   }
 
   const sponsor = Keypair.fromSecret(secret);
@@ -100,28 +101,4 @@ export async function POST(req: Request) {
     }
   }
   return NextResponse.json({ ok: false, hash, error: "Still pending. Check the explorer." }, { status: 202 });
-}
-
-/** The contract's error codes, as the person tipping would describe them. */
-const ERRORS: Record<number, string> = {
-  1: "StarJar is paused for maintenance",
-  2: "handles use 3 to 24 lowercase letters, digits or underscores",
-  3: "that handle is taken",
-  4: "this wallet already has a jar",
-  5: "this wallet has no jar yet",
-  6: "no jar with that handle",
-  7: "that token is not accepted",
-  8: "the amount must be above zero",
-  9: "the message is longer than 140 characters",
-  10: "the name must be 1 to 48 characters",
-  11: "the bio is longer than 160 characters",
-  12: "you cannot tip your own jar",
-};
-
-function contractError(raw: string): string {
-  const code = /Error\(Contract, #(\d+)\)/.exec(raw)?.[1];
-  if (code && ERRORS[Number(code)]) return ERRORS[Number(code)];
-  if (/balance|underfunded|insufficient/i.test(raw)) return "not enough balance for this tip";
-  if (/trustline/i.test(raw)) return "this wallet has no trustline for that token";
-  return "simulation failed";
 }
