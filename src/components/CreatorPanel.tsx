@@ -99,7 +99,7 @@ function RegisterForm({ address, onDone, onSwitch }: { address: string; onDone: 
   const [handle, setHandle] = useState("");
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
-  const [taken, setTaken] = useState<boolean | null>(null);
+  const [taken, setTaken] = useState<boolean | null | "error">(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -114,7 +114,7 @@ function RegisterForm({ address, onDone, onSwitch }: { address: string; onDone: 
     const t = setTimeout(() => {
       getCreator(handle)
         .then((p) => setTaken(!!p))
-        .catch(() => setTaken(null));
+        .catch(() => setTaken("error"));
     }, 350);
     return () => clearTimeout(t);
   }, [handle, handleOk]);
@@ -159,16 +159,18 @@ function RegisterForm({ address, onDone, onSwitch }: { address: string; onDone: 
               spellCheck={false}
             />
           </div>
-          <span style={{ fontSize: 12.5, fontFamily: FONT.mono, color: taken ? C.coral : "rgba(255,255,255,.5)" }}>
+          <span style={{ fontSize: 12.5, fontFamily: FONT.mono, color: taken === true || taken === "error" ? C.coral : "rgba(255,255,255,.5)" }}>
             {!handle
               ? "3–24 characters: a–z, 0–9, _"
               : !handleOk
                 ? "at least 3 characters"
                 : taken === null
                   ? "checking…"
-                  : taken
-                    ? "taken"
-                    : "available"}
+                  : taken === "error"
+                    ? "could not reach the network, edit the handle to retry"
+                    : taken
+                      ? "taken"
+                      : "available"}
           </span>
         </label>
         <label style={{ display: "grid", gap: 8 }}>
@@ -199,7 +201,8 @@ function RegisterForm({ address, onDone, onSwitch }: { address: string; onDone: 
 }
 
 function Dashboard({ jar, address, onSwitch }: { jar: Jar; address: string; onSwitch: () => void }) {
-  const link = `${CONFIG.siteUrl.replace(/\/$/, "")}/j/${jar.profile.handle}`;
+  // The address the creator is actually on, so the link is right on any domain.
+  const link = `${window.location.origin}/j/${jar.profile.handle}`;
   const [copied, setCopied] = useState(false);
   const tweet = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
     `Tip me on StarJar: XLM or USDC, no gas fees on @StellarOrg ✦ ${link}`,
