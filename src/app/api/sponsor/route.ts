@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { CONFIG } from "@/lib/config";
 import { explainContractError } from "@/lib/errors";
 import { server } from "@/lib/soroban";
-import { WindowLimiter } from "@/lib/server/rate-limit";
+import { DailyBudget, WindowLimiter, clientIp } from "@/lib/server/rate-limit";
 import { checkEnvelope, type Policy } from "@/lib/server/sponsor-policy";
 
 export const runtime = "nodejs";
@@ -16,14 +16,17 @@ const policy: Policy = {
   networkPassphrase: CONFIG.passphrase,
   contractId: CONFIG.contractId,
   functions: ["tip", "register"],
-  maxResourceFee: BigInt(process.env.SPONSOR_MAX_RESOURCE_FEE ?? "2000000"),
+  maxResourceFee: BigInt(process.env.SPONSOR_MAX_RESOURCE_FEE ?? "1000000"),
   maxInclusionFee: 10_000n,
+  // 0.1 XLM or 0.1 USDC; both use 7 decimals.
+  minTipAmount: BigInt(process.env.SPONSOR_MIN_TIP_RAW ?? "1000000"),
   maxValiditySeconds: 300,
 };
 
-const perAccount = new WindowLimiter(Number(process.env.SPONSOR_DAILY_LIMIT_PER_ACCOUNT ?? "25"), DAY);
-const perIp = new WindowLimiter(60, 60 * 60 * 1000);
-const everyone = new WindowLimiter(600, 60 * 60 * 1000);
+const perAccount = new WindowLimiter(Number(process.env.SPONSOR_DAILY_LIMIT_PER_ACCOUNT ?? "10"), DAY);
+const perIp = new WindowLimiter(30, 60 * 60 * 1000);
+const everyone = new WindowLimiter(200, 60 * 60 * 1000);
+const budget = new DailyBudget(BigInt(Math.round(Number(process.env.SPONSOR_DAILY_BUDGET_XLM ?? "25") * 1e7)));
 
 const fail = (status: number, error: string) => NextResponse.json({ ok: false, error }, { status });
 
@@ -51,7 +54,7 @@ export async function POST(req: Request) {
   const verdict = checkEnvelope(String(body.xdr ?? ""), policy, Math.floor(Date.now() / 1000));
   if (!verdict.ok) return fail(400, `Not sponsored: ${verdict.reason}`);
 
-  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
+  const ip = clientIp(req.headers);
   if (!everyone.take("all").ok) return fail(429, "The sponsor is busy. Try again in a few minutes.");
   if (!perIp.take(ip).ok) return fail(429, "Too many sponsored transactions from this network. Try again later.");
   if (!perAccount.take(verdict.source).ok) {
@@ -69,13 +72,20 @@ export async function POST(req: Request) {
   }
 
   const sponsor = Keypair.fromSecret(secret);
-  const base = verdict.inclusionFee > 100n ? verdict.inclusionFee.toString() : "100";
-  const bump = TransactionBuilder.buildFeeBumpTransaction(sponsor, base, verdict.tx, CONFIG.passphrase);
+  const base = verdict.inclusionFee > 100n ? verdict.inclusionFee : 100n;
+  const bump = TransactionBuilder.buildFeeBumpTransaction(sponsor, base.toString(), verdict.tx, CONFIG.passphrase);
   bump.sign(sponsor);
+
+  const maxFee = BigInt(bump.fee);
+  if (!budget.reserve(maxFee)) {
+    perAccount.refund(verdict.source);
+    return fail(503, "Today's fee budget is used up. Sponsored transactions resume tomorrow (UTC).");
+  }
 
   const sent = await rpcServer.sendTransaction(bump);
   if (sent.status === "ERROR" || sent.status === "TRY_AGAIN_LATER") {
     perAccount.refund(verdict.source);
+    budget.release(maxFee);
     return fail(502, `Network did not accept the transaction (${sent.status})`);
   }
 

@@ -35,6 +35,7 @@ const policy: Policy = {
   functions: ["tip", "register"],
   maxResourceFee: 2_000_000n,
   maxInclusionFee: 10_000n,
+  minTipAmount: 1_000_000n,
   maxValiditySeconds: 300,
 };
 
@@ -51,6 +52,7 @@ interface Opts {
   extraSig?: Keypair;
   prepared?: boolean;
   passphrase?: string;
+  amount?: bigint;
 }
 
 function envelope(o: Opts = {}): { xdr: string; source: Keypair; tx: Transaction } {
@@ -65,7 +67,7 @@ function envelope(o: Opts = {}): { xdr: string; source: Keypair; tx: Transaction
     new Address(actor).toScVal(),
     nativeToScVal("ada", { type: "string" }),
     new Address(OTHER).toScVal(),
-    nativeToScVal(10_000_000n, { type: "i128" }),
+    nativeToScVal(o.amount ?? 10_000_000n, { type: "i128" }),
     nativeToScVal("hi", { type: "string" }),
   );
 
@@ -110,6 +112,11 @@ test("admin functions are not", () => {
   for (const fn of ["set_paused", "set_admin", "upgrade", "set_token"]) {
     assert.match(reason(envelope({ fn }).xdr), /not sponsored/);
   }
+});
+
+test("dust tips are not sponsored", () => {
+  assert.equal(reason(envelope({ amount: 999_999n }).xdr), "tip below the sponsored minimum");
+  assert.equal(reason(envelope({ amount: 1_000_000n }).xdr), "ok");
 });
 
 test("another contract is refused", () => {

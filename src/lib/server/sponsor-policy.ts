@@ -4,6 +4,7 @@ import {
   Keypair,
   StrKey,
   TransactionBuilder,
+  scValToNative,
   type Transaction,
   type xdr,
 } from "@stellar/stellar-sdk";
@@ -51,6 +52,12 @@ export interface Policy {
   maxResourceFee: bigint;
   /** Largest inclusion fee per operation the inner envelope may bid, in stroops. */
   maxInclusionFee: bigint;
+  /**
+   * Smallest tip, in the token's raw units, the sponsor pays a fee for.
+   * Without it, dust tips turn the sponsor's balance into a free faucet for
+   * transaction spam. The contract itself accepts any positive amount.
+   */
+  minTipAmount: bigint;
   /** The envelope must expire within this many seconds of now. */
   maxValiditySeconds: number;
 }
@@ -115,6 +122,16 @@ export function checkEnvelope(envelopeXdr: string, policy: Policy, nowSeconds: n
     if (tag(entry.credentials) !== "sorobanCredentialsSourceAccount") {
       return no("only source-account authorisation is sponsored");
     }
+  }
+
+  if (fn === "tip") {
+    let amount: bigint;
+    try {
+      amount = BigInt(scValToNative(call.args[3]) as bigint);
+    } catch {
+      return no("unreadable tip amount");
+    }
+    if (amount < policy.minTipAmount) return no("tip below the sponsored minimum");
   }
 
   const ext = (tx.toEnvelope() as unknown as EnvelopeV1).v1?.tx?.ext;
