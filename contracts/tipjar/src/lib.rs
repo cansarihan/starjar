@@ -15,6 +15,9 @@ use soroban_sdk::{
     Env, String, Vec,
 };
 
+#[cfg(test)]
+mod test;
+
 /// Recent tips kept per jar, oldest dropped first.
 pub const RECENT_LIMIT: u32 = 20;
 pub const HANDLE_MIN: u32 = 3;
