@@ -1,0 +1,31 @@
+{
+  "name": "starjar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test:contracts": "cargo test",
+    "test:sponsor": "tsx --test scripts/sponsor-policy.test.ts",
+    "smoke": "tsx scripts/smoke.ts",
+    "users:export": "tsx scripts/export-users.ts"
+  },
+  "dependencies": {
+    "@creit.tech/stellar-wallets-kit": "^2.8.0",
+    "@stellar/stellar-sdk": "^17.4.0",
+    "next": "^15.5.29",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "dotenv": "^18.0.9",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}
