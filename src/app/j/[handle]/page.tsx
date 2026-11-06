@@ -109,6 +109,7 @@ export default async function JarPage({ params }: Params) {
           </div>
 
           <aside
+            className="jar-aside"
             style={{
               position: "sticky",
               top: 100,

@@ -4,7 +4,7 @@ import { PillLink } from "@/components/Hero";
 import { CONFIG } from "@/lib/config";
 import { C, FONT, shortKey } from "@/lib/design";
 
-function Eyebrow({ children }: { children: ReactNode }) {
+function Eyebrow({ children, dark }: { children: ReactNode; dark?: boolean }) {
   return (
     <div
       style={{
@@ -12,7 +12,7 @@ function Eyebrow({ children }: { children: ReactNode }) {
         fontSize: 12,
         letterSpacing: ".12em",
         textTransform: "uppercase",
-        color: C.sun,
+        color: dark ? C.sunDeep : C.sun,
         marginBottom: 18,
       }}
     >
@@ -106,7 +106,7 @@ export function Gasless() {
     <section id="gasless" style={{ background: C.paper, color: C.ink, padding: "120px 0" }}>
       <div style={wrap} className="split-wide">
         <div>
-          <Eyebrow>Fee sponsorship</Eyebrow>
+          <Eyebrow dark>Fee sponsorship</Eyebrow>
           <Title dark>Your signature, our fee.</Title>
           <p style={{ fontSize: 17, lineHeight: 1.65, color: "rgba(10,10,10,.7)", maxWidth: 520 }}>
             Stellar lets one account pay the fee for another account&apos;s transaction without touching what it
