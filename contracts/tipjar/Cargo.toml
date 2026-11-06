@@ -1,0 +1,18 @@
+[package]
+name = "starjar-tipjar"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Creator tip jars: register a handle, receive tips in allowlisted tokens with a short message"
+license = "MIT"
+repository = "https://github.com/cansarihan/starjar"
+
+[lib]
+crate-type = ["cdylib"]
+doctest = false
+
+[dependencies]
+soroban-sdk = { workspace = true }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }
