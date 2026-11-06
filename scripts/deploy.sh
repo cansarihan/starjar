@@ -49,6 +49,14 @@ id=$(stellar contract deploy \
   --admin "$admin" \
   --tokens "[\"$xlm\",\"$usdc\"]")
 
+# Pay the contract's rent up front. Otherwise the first user's transaction
+# carries the cost of extending the code and instance entries, which is far
+# above what the sponsor agrees to cover for one call.
+stellar contract extend --id "$id" --durability persistent --ledgers-to-extend 3000000 \
+  --source "$source" --network "$network" >/dev/null
+stellar contract extend --wasm "$wasm" --durability persistent --ledgers-to-extend 3000000 \
+  --source "$source" --network "$network" >/dev/null
+
 echo
 echo "network      $network"
 echo "contract     $id"
