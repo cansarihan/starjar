@@ -11,7 +11,8 @@
     "test:contracts": "cargo test",
     "test:sponsor": "tsx --test scripts/sponsor-policy.test.ts",
     "smoke": "tsx scripts/smoke.ts",
-    "users:export": "tsx scripts/export-users.ts"
+    "users:export": "tsx scripts/export-users.ts",
+    "seed:demo": "tsx scripts/seed-demo.ts"
   },
   "dependencies": {
     "@creit.tech/stellar-wallets-kit": "^2.8.0",
