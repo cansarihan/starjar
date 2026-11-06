@@ -22,6 +22,23 @@ Rise In × Stellar Builder Challenge · Level 6 Black Belt · built by
 **Live:** _pending mainnet launch_ · **Contract (testnet):**
 [`CBPKETG2…TDLRE`](https://stellar.expert/explorer/testnet/contract/CBPKETG2BKW2AGA5ALX4L3YERCFJBTFPMAJ62BGBJMX5AWBMIP6TDLRE)
 
+## Screenshots
+
+Taken from the app running against testnet. The jar shown, `mira_draws`, was
+created with `npm run seed:demo`: fresh friendbot accounts, every call through
+the real sponsor route.
+
+| | |
+|---|---|
+| ![Landing page](docs/screenshots/01-home.png) | ![How it works](docs/screenshots/02-how-it-works.png) |
+| **Landing page** with live counters read from the contract | **How it works** |
+| ![Fee sponsorship](docs/screenshots/03-fee-sponsorship.png) | ![Jar page](docs/screenshots/04-jar-page.png) |
+| **Fee sponsorship**, step by step | **A jar**: totals, recent tips with messages, the tip form |
+| ![Connect a wallet](docs/screenshots/05-connect.png) | ![Claim a handle](docs/screenshots/06-claim-handle.png) |
+| **Open your jar**: connect any Stellar wallet | **Claim a handle**, checked against the contract as you type |
+| ![Creator dashboard](docs/screenshots/07-creator-dashboard.png) | <img src="docs/screenshots/08-mobile-jar.png" alt="Mobile jar page" width="260"> |
+| **Creator dashboard**: share link, totals, latest tips | **Mobile**: the tip form comes first |
+
 ---
 
 ## Evaluating this in five minutes
@@ -229,9 +246,14 @@ Planned for the next phase, before feedback arrives:
 | | Network | Address |
 |---|---|---|
 | Tip jar contract | testnet | [`CBPKETG2BKW2AGA5ALX4L3YERCFJBTFPMAJ62BGBJMX5AWBMIP6TDLRE`](https://stellar.expert/explorer/testnet/contract/CBPKETG2BKW2AGA5ALX4L3YERCFJBTFPMAJ62BGBJMX5AWBMIP6TDLRE) |
-| XLM SAC | testnet | `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC` |
-| USDC SAC | testnet | `CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA` |
+| XLM SAC | testnet | [`CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC`](https://stellar.expert/explorer/testnet/contract/CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC) |
+| USDC SAC | testnet | [`CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA`](https://stellar.expert/explorer/testnet/contract/CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA) |
+| Fee sponsor | testnet | [`GAYUZLQUDJYNB5O5VY7RR3XSJCABCV3M2K5OCYAEBF23RABZAZNBMYTF`](https://stellar.expert/explorer/testnet/account/GAYUZLQUDJYNB5O5VY7RR3XSJCABCV3M2K5OCYAEBF23RABZAZNBMYTF) |
+| Contract admin | testnet | [`GD6JMHFO2NZI7XWHEQY3IS3SBDMXKVSWWVHCPVDB33UFSHFVFFDL4OQV`](https://stellar.expert/explorer/testnet/account/GD6JMHFO2NZI7XWHEQY3IS3SBDMXKVSWWVHCPVDB33UFSHFVFFDL4OQV) |
+| Example sponsored tip | testnet | [`ff08cc78…10f2d2b`](https://stellar.expert/explorer/testnet/tx/ff08cc789db01a38dec61e9b943e6eb41b720c91dbfcae2b27095eb6b10f2d2b): a fee bump whose fee source is the sponsor and whose inner transaction is signed by the fan |
 | Tip jar contract | mainnet | _pending_ |
+| XLM SAC | mainnet | [`CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA`](https://stellar.expert/explorer/public/contract/CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA) |
+| USDC SAC | mainnet | [`CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75`](https://stellar.expert/explorer/public/contract/CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75) |
 | Fee sponsor | mainnet | _pending_ |
 
 ## Running it yourself
