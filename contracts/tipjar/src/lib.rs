@@ -26,9 +26,13 @@ pub const NAME_MAX: u32 = 48;
 pub const BIO_MAX: u32 = 160;
 pub const MESSAGE_MAX: u32 = 140;
 
-/// About 30 days at 5s ledgers. Entries are bumped back to this on every write.
-const TTL_EXTEND_TO: u32 = 518_400;
-const TTL_THRESHOLD: u32 = TTL_EXTEND_TO - 17_280;
+/// About 170 days at 5s ledgers, just under the network's maximum entry TTL.
+/// Entries are bumped back to this when they are written or a jar is tipped,
+/// and only once a week has passed, so a busy jar does not pay rent per tip.
+/// A jar nobody touches for half a year is archived by the network, not lost:
+/// it can be restored with a RestoreFootprint operation.
+const TTL_EXTEND_TO: u32 = 3_000_000;
+const TTL_THRESHOLD: u32 = TTL_EXTEND_TO - 120_960;
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -239,6 +243,12 @@ impl TipJar {
             ledger: env.ledger().sequence(),
         });
         put(&env, &recent_key, &recent);
+
+        // A jar that is being tipped is alive; keep its owner lookup alive with it.
+        let owner_key = Key::HandleOf(profile.owner.clone());
+        if env.storage().persistent().has(&owner_key) {
+            env.storage().persistent().extend_ttl(&owner_key, TTL_THRESHOLD, TTL_EXTEND_TO);
+        }
 
         token::TokenClient::new(&env, &token).transfer(&from, &profile.owner, &amount);
 

@@ -327,3 +327,18 @@ fn set_admin_needs_both_signatures() {
     assert!(signers.contains(&next));
     assert_eq!(t.jar.admin(), next);
 }
+
+#[test]
+fn writes_keep_entries_alive_for_months() {
+    use soroban_sdk::testutils::storage::Persistent as _;
+    let t = setup();
+    let owner = creator(&t, "ada");
+    let fan = funded(&t, &t.xlm, 10);
+    t.jar.tip(&fan, &s(&t.env, "ada"), &t.xlm, &1, &s(&t.env, ""));
+    t.env.as_contract(&t.jar.address, || {
+        let ttl_creator = t.env.storage().persistent().get_ttl(&Key::Creator(s(&t.env, "ada")));
+        let ttl_owner = t.env.storage().persistent().get_ttl(&Key::HandleOf(owner.clone()));
+        assert!(ttl_creator >= 2_800_000, "{ttl_creator}");
+        assert!(ttl_owner >= 2_800_000, "{ttl_owner}");
+    });
+}
