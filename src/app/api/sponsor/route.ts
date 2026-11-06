@@ -16,7 +16,7 @@ const policy: Policy = {
   networkPassphrase: CONFIG.passphrase,
   contractId: CONFIG.contractId,
   functions: ["tip", "register"],
-  maxResourceFee: BigInt(process.env.SPONSOR_MAX_RESOURCE_FEE ?? "1000000"),
+  maxResourceFee: BigInt(process.env.SPONSOR_MAX_RESOURCE_FEE ?? "2000000"),
   maxInclusionFee: 10_000n,
   // 0.1 XLM or 0.1 USDC; both use 7 decimals.
   minTipAmount: BigInt(process.env.SPONSOR_MIN_TIP_RAW ?? "1000000"),

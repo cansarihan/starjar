@@ -26,12 +26,13 @@ pub const NAME_MAX: u32 = 48;
 pub const BIO_MAX: u32 = 160;
 pub const MESSAGE_MAX: u32 = 140;
 
-/// About 170 days at 5s ledgers, just under the network's maximum entry TTL.
+/// 120 days at 5s ledgers: mainnet's minimum TTL for a new persistent entry,
+/// so creating an entry costs no rent beyond what the network already requires.
 /// Entries are bumped back to this when they are written or a jar is tipped,
 /// and only once a week has passed, so a busy jar does not pay rent per tip.
-/// A jar nobody touches for half a year is archived by the network, not lost:
+/// A jar nobody touches for four months is archived by the network, not lost:
 /// it can be restored with a RestoreFootprint operation.
-const TTL_EXTEND_TO: u32 = 3_000_000;
+const TTL_EXTEND_TO: u32 = 2_073_600;
 const TTL_THRESHOLD: u32 = TTL_EXTEND_TO - 120_960;
 
 #[contracterror]

@@ -338,7 +338,7 @@ fn writes_keep_entries_alive_for_months() {
     t.env.as_contract(&t.jar.address, || {
         let ttl_creator = t.env.storage().persistent().get_ttl(&Key::Creator(s(&t.env, "ada")));
         let ttl_owner = t.env.storage().persistent().get_ttl(&Key::HandleOf(owner.clone()));
-        assert!(ttl_creator >= 2_800_000, "{ttl_creator}");
-        assert!(ttl_owner >= 2_800_000, "{ttl_owner}");
+        assert!(ttl_creator >= 2_000_000, "{ttl_creator}");
+        assert!(ttl_owner >= 2_000_000, "{ttl_owner}");
     });
 }
