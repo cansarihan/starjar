@@ -29,8 +29,8 @@ jobs:
           PUBLIC_USDC_SAC: ${{ vars.PUBLIC_USDC_SAC }}
       - name: Commit new rows
         run: |
-          git config user.name "${{ github.repository_owner }}"
-          git config user.email "${{ github.repository_owner }}@users.noreply.github.com"
+          git config user.name "Can Sarıhan"
+          git config user.email "cansarihan@bluenetwork.com.tr"
           git add docs/proof
           git diff --cached --quiet || git commit -m "Record on-chain activity for $(date -u +%F)"
           git push
