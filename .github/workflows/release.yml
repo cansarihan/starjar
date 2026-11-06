@@ -1,0 +1,25 @@
+name: Build and Release
+
+# Tagging v* builds the contract in a clean, public environment and attaches
+# the WASM with its hash. stellar.expert links the deployed contract back to
+# this source when the hashes match.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write
+  contents: write
+  attestations: write
+
+jobs:
+  tipjar:
+    uses: stellar-expert/soroban-build-workflow/.github/workflows/release.yml@main
+    with:
+      release_name: ${{ github.ref_name }}
+      release_description: 'StarJar tip jar contract'
+      relative_path: 'contracts/tipjar'
+      package: 'starjar-tipjar'
+    secrets:
+      release_token: ${{ secrets.GITHUB_TOKEN }}

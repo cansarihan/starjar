@@ -1,0 +1,36 @@
+name: Export on-chain activity
+
+# RPC keeps events for about a week; this keeps the record complete by
+# exporting daily and committing any new rows.
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    if: vars.PUBLIC_TIPJAR_CONTRACT_ID != ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run users:export
+        env:
+          PUBLIC_STELLAR_NETWORK: ${{ vars.PUBLIC_STELLAR_NETWORK }}
+          PUBLIC_TIPJAR_CONTRACT_ID: ${{ vars.PUBLIC_TIPJAR_CONTRACT_ID }}
+          PUBLIC_XLM_SAC: ${{ vars.PUBLIC_XLM_SAC }}
+          PUBLIC_USDC_SAC: ${{ vars.PUBLIC_USDC_SAC }}
+      - name: Commit new rows
+        run: |
+          git config user.name "${{ github.repository_owner }}"
+          git config user.email "${{ github.repository_owner }}@users.noreply.github.com"
+          git add docs/proof
+          git diff --cached --quiet || git commit -m "Record on-chain activity for $(date -u +%F)"
+          git push
