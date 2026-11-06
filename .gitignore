@@ -19,3 +19,6 @@ next-env.d.ts
 
 # Stellar CLI local config
 .stellar/
+
+# Testnet activity is noise; only mainnet proof is kept
+docs/proof/testnet-*
