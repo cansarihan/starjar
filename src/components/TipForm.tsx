@@ -51,7 +51,8 @@ export function TipForm({
   } catch {
     raw = null;
   }
-  const valid = raw !== null && raw > 0n && new TextEncoder().encode(message).length <= LIMITS.messageMax;
+  const belowMin = raw !== null && raw < LIMITS.minTipRaw;
+  const valid = raw !== null && !belowMin && new TextEncoder().encode(message).length <= LIMITS.messageMax;
 
   async function submit() {
     if (!token || raw === null) return;
@@ -157,6 +158,11 @@ export function TipForm({
           onChange={(e) => setAmount(e.target.value.replace(",", "."))}
           aria-invalid={!valid}
         />
+        {belowMin && (
+          <span style={{ fontSize: 12.5, color: C.coral }}>
+            The smallest gasless tip is {Number(LIMITS.minTipRaw) / 10 ** token.decimals} {token.symbol}.
+          </span>
+        )}
         {held !== null && (
           <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.5)", fontFamily: FONT.mono }}>
             balance {held} {token.symbol}

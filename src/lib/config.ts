@@ -61,6 +61,8 @@ export const LIMITS = {
   nameMax: 48,
   bioMax: 160,
   messageMax: 140,
+  /** Smallest tip the fee sponsor covers, in raw units. Mirrors SPONSOR_MIN_TIP_RAW. */
+  minTipRaw: 1_000_000n,
 } as const;
 
 export const HANDLE_RE = /^[a-z0-9_]{3,24}$/;
